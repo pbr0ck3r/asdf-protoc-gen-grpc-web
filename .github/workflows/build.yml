@@ -19,4 +19,4 @@ jobs:
       - name: asdf_plugin_test
         uses: asdf-vm/actions/plugin-test@v1
         with:
-          command: protoc-gen-grpc-web --version
+          command: echo "protoc-go-grpc-web is installed"

@@ -2,8 +2,7 @@
 
 set -euo pipefail
 
-# TODO: Ensure this is the correct GitHub homepage where releases can be downloaded for protoc-gen-grpc-web.
-GH_REPO="https://github.com/pbr0ck3r/protoc-gen-grpc-web"
+GH_REPO="https://github.com/grpc/grpc-web"
 TOOL_NAME="protoc-gen-grpc-web"
 TOOL_TEST="protoc-gen-grpc-web --version"
 
@@ -36,15 +35,39 @@ list_all_versions() {
   list_github_tags
 }
 
+get_platform() {
+  local os=$(uname)
+  if [[ "${os}" == "Darwin" ]]; then
+    echo "darwin"
+  elif [[ "${os}" == "Linux" ]]; then
+    echo "linux"
+  else
+    echo >&2 "unsupported os: ${os}" && exit 1
+  fi
+}
+
+get_arch() {
+  local os=$(uname)
+  local arch=$(uname -m)
+  # On ARM Macs, uname -m returns "arm64", but in protoc releases this architecture is called "aarch_64"
+  if [[ "${os}" == "Darwin" && "${arch}" == "arm64" ]]; then
+    echo "aarch_64"
+  elif [[ "${os}" == "Linux" && "${arch}" == "aarch64" ]]; then
+    echo "aarch_64"
+  else
+    echo "${arch}"
+  fi
+}
+
 download_release() {
   local version filename url
   version="$1"
   filename="$2"
 
-  # TODO: Adapt the release URL convention for protoc-gen-grpc-web
-  url="$GH_REPO/archive/v${version}.tar.gz"
+  url="$GH_REPO/releases/download/${version}/$TOOL_NAME-${version}-$(get_platform)-$(get_arch)"
 
   echo "* Downloading $TOOL_NAME release $version..."
+
   curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
 }
 
@@ -59,9 +82,10 @@ install_version() {
 
   (
     mkdir -p "$install_path"
-    cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
+    cp "$ASDF_DOWNLOAD_PATH/$TOOL_NAME-${version}" "$install_path/$TOOL_NAME"
+    chmod +x "$install_path/$TOOL_NAME"
 
-    # TODO: Assert protoc-gen-grpc-web executable exists.
+    # TODO: Figure out how to test as no arguements can be passed
     local tool_cmd
     tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
     test -x "$install_path/$tool_cmd" || fail "Expected $install_path/$tool_cmd to be executable."
