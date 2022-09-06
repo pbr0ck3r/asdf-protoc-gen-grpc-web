@@ -51,9 +51,11 @@ get_arch() {
   local arch=$(uname -m)
   # On ARM Macs, uname -m returns "arm64", but in protoc releases this architecture is called "aarch_64"
   if [[ "${os}" == "Darwin" && "${arch}" == "arm64" ]]; then
-    echo "aarch_64"
+    # echo "aarch_64"
+    echo "x86_64"
   elif [[ "${os}" == "Linux" && "${arch}" == "aarch64" ]]; then
-    echo "aarch_64"
+    # echo "aarch_64"
+    echo "x86_64"
   else
     echo "${arch}"
   fi
