@@ -84,7 +84,7 @@ install_version() {
 
   (
     mkdir -p "$install_path"
-    cp "$ASDF_DOWNLOAD_PATH/$TOOL_NAME-${version}" "$install_path/$TOOL_NAME"
+    cp "$ASDF_DOWNLOAD_PATH/$TOOL_NAME" "$install_path/$TOOL_NAME"
     chmod +x "$install_path/$TOOL_NAME"
 
     # TODO: Figure out how to test as no arguements can be passed
